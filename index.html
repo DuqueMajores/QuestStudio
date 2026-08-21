@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QuestStudio</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#fff;--text:#18212f;--muted:#667085;--line:#e5e7eb;--primary:#4f46e5;--primary2:#4338ca;--good:#168a5a;--bad:#d14343;--shadow:0 10px 30px rgba(16,24,40,.07)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}
+header{height:76px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:0 24px;position:sticky;top:0;z-index:20}
+.brand{font-size:22px;font-weight:800;cursor:pointer;white-space:nowrap}.metrics{display:flex;gap:12px;margin-left:auto}.metric{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13px}.metric b{font-size:15px}.prof{display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}.prof.active{background:#eef2ff;color:var(--primary);border-color:#c7d2fe}
+.search{position:relative;width:min(360px,32vw)}.search input{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;outline:none;background:#fafafa}.search input:focus{border-color:#a5b4fc;background:#fff}.results{position:absolute;top:47px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:430px;overflow-y:auto}.result{padding:12px 14px;border-bottom:1px solid #f0f1f3;cursor:pointer}.result:hover{background:#f8faff}.result small{color:var(--muted);display:block;margin-top:4px}
+nav{background:#fff;border-bottom:1px solid var(--line);display:flex;padding:0 24px;gap:6px;position:sticky;top:76px;z-index:15}.tab{padding:15px 17px;border:0;background:none;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+main{padding:24px;max-width:1500px;margin:auto}.layout{display:grid;grid-template-columns:300px 1fr;gap:20px}.panel,.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}.side{padding:16px;max-height:calc(100vh - 140px);overflow:auto}.side h3,.section-title{margin:0 0 12px}.folder{border:1px solid var(--line);border-radius:10px;margin-bottom:9px;overflow:hidden}.folder-head{padding:11px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.folder-head b{font-weight:800}.folder-body{padding:0 12px 10px}.subject{padding:7px 0;color:#475467;cursor:pointer;display:flex;justify-content:space-between}.subject:hover{text-decoration:underline}.reset{font-size:11px;border:0;background:#fff0f0;color:var(--bad);padding:5px 7px;border-radius:6px}
+.view{min-width:0}.hero{padding:22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.stat{padding:16px;background:#fff;border:1px solid var(--line);border-radius:12px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{font-size:26px}
+.question{padding:22px;margin-bottom:14px}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.tag{background:#eef2ff;color:#3730a3;padding:5px 8px;border-radius:7px;font-size:12px}.statement{font-size:17px;line-height:1.65;white-space:pre-wrap;margin:14px 0}.options{display:grid;gap:9px}.option{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:left;background:#fff}.option:hover{border-color:#a5b4fc}.option input{margin-top:4px}.answer{margin-top:14px}.answer button,.primary{border:0;background:var(--primary);color:#fff;padding:10px 15px;border-radius:9px}.answer button:hover,.primary:hover{background:var(--primary2)}.feedback{margin-top:13px;padding:13px;border-radius:9px}.good{background:#ecfdf3;color:#067647}.bad{background:#fef3f2;color:#b42318}.explanation{margin-top:10px;color:#475467;line-height:1.55}
+.teacher-box{margin-top:15px;padding:15px;border:1px solid #c7d2fe;background:#f8faff;border-radius:10px}.teacher-box textarea{width:100%;min-height:120px;resize:vertical;padding:11px;border:1px solid var(--line);border-radius:9px}.review-score{margin-top:10px;font-weight:700}
+.empty{padding:45px;text-align:center;color:var(--muted)}.manage{display:grid;grid-template-columns:300px 1fr 1fr;gap:14px}.manage .panel{padding:16px;min-height:500px;overflow:auto}.list-item{padding:9px 10px;border-radius:8px;cursor:pointer}.list-item:hover,.list-item.sel{background:#eef2ff}.list-item b{font-weight:800}.toolbar{display:flex;gap:8px;margin-bottom:12px}.toolbar textarea{flex:1;min-height:90px;padding:10px;border:1px solid var(--line);border-radius:9px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-grid input,.form-grid select,.form-grid textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px}.form-grid textarea{min-height:110px}.full{grid-column:1/-1}.danger{background:#fff0f0;color:#b42318;border:0;border-radius:8px;padding:8px 10px}.topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+@media(max-width:1000px){header{gap:10px;padding:0 12px}.metrics{display:none}.search{width:38vw}.layout{grid-template-columns:240px 1fr}.manage{grid-template-columns:1fr 1fr}.manage .formpanel{grid-column:1/-1}}
+@media(max-width:700px){header{height:auto;min-height:70px;flex-wrap:wrap;padding:10px 12px}.search{order:3;width:100%}nav{top:0;overflow:auto}.layout,.manage{grid-template-columns:1fr}main{padding:12px}.side{max-height:340px}.stats{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const KEY='queststudio-v1';
+const seed={
+books:[
+{id:'b1',name:'Caderno 1',subjects:[
+{id:'s1',name:'Lógica de Programação',q:[]},
+{id:'s2',name:'Banco de Dados',q:[]}]},
+{id:'b2',name:'Caderno 2',subjects:[
+{id:'s3',name:'Engenharia de Software',q:[]},
+{id:'s4',name:'Redes',q:[]}]}
+],
+questions:[
+{id:'q1',book:'b1',subject:'s1',board:'Cesgranrio',format:'Múltipla Escolha',statement:'Qual estrutura de repetição é normalmente usada quando a quantidade de iterações é conhecida previamente?',options:['for','switch','try/catch','class'],answer:0,explanation:'O laço for é apropriado quando a repetição pode ser controlada por um contador ou uma condição inicial/final.'},
+{id:'q2',book:'b1',subject:'s2',board:'Cesgranrio',format:'Certo ou Errado',statement:'Uma chave primária identifica unicamente cada registro de uma tabela.',options:['Certo','Errado'],answer:0,explanation:'A chave primária deve identificar cada linha de forma única.'},
+{id:'q3',book:'b2',subject:'s3',board:'FCC',format:'Múltipla Escolha',statement:'Qual modelo de desenvolvimento organiza o projeto em etapas sequenciais?',options:['Cascata','Scrum','Kanban','XP'],answer:0,explanation:'O modelo Cascata organiza o desenvolvimento em fases sequenciais.'},
+{id:'q4',book:'b2',subject:'s4',board:'FGV',format:'Certo ou Errado',statement:'O protocolo HTTP é usado na camada de aplicação da arquitetura TCP/IP.',options:['Certo','Errado'],answer:0,explanation:'HTTP é um protocolo da camada de aplicação.'}
+],
+done:[],review:[],stats:{correct:0,wrong:0},mode:'study'
+};
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||seed;
+if(!db.questions.length) db=seed;
+let state={tab:'estudar',search:'',selectedBook:null,selectedSubject:null,manageBook:null,manageSubject:null};
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function subjectName(id){for(const b of db.books){const s=b.subjects.find(x=>x.id===id);if(s)return s.name}return ''}
+function bookName(id){return db.books.find(x=>x.id===id)?.name||''}
+function pending(){return db.questions.filter(q=>!db.done.includes(q.id)&&!db.review.includes(q.id))}
+function escape(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function pct(){const t=db.stats.correct+db.stats.wrong;return t?Math.round(db.stats.correct/t*100):0}
+function render(){
+document.getElementById('app').innerHTML=`
+<header><div class="brand" onclick="go('estudar')">QuestStudio</div>
+<div class="search"><input value="${escape(state.search)}" placeholder="Pesquisar questões..." oninput="search(this.value)" onkeydown="if(event.key==='Escape')search('')">${state.search?results():''}</div>
+<div class="metrics"><div class="metric">Acertos <b>${db.stats.correct}</b></div><div class="metric">Erros <b>${db.stats.wrong}</b></div><div class="metric">Desempenho <b>${pct()}%</b></div></div>
+<button class="prof ${db.mode==='teacher'?'active':''}" onclick="toggleTeacher()">🎓 Modo Professor</button></header>
+<nav>${[['estudar','Estudar'],['revisao','Área de Revisão'],['feitas','Questões Feitas'],['gerenciar','Gerenciar Conteúdo']].map(x=>`<button class="tab ${state.tab===x[0]?'active':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</nav>
+<main>${state.tab==='gerenciar'?manageView():studyView()}</main>`;
+}
+function results(){
+const term=state.search.toLowerCase().trim(); if(!term)return '';
+const arr=db.questions.filter(q=>(q.statement+' '+q.explanation+' '+q.board+' '+subjectName(q.subject)+' '+bookName(q.book)).toLowerCase().includes(term)).slice(0,20);
+return `<div class="results">${arr.length?arr.map(q=>`<div class="result" onclick="jump('${q.id}')"><b>${escape(q.statement.slice(0,90))}${q.statement.length>90?'…':''}</b><small>${escape(bookName(q.book))} · ${escape(subjectName(q.subject))}</small></div>`).join(''):'<div class="result">Nenhuma questão encontrada.</div>'}</div>`
+}
+function studyView(){
+let arr=state.tab==='revisao'?db.questions.filter(q=>db.review.includes(q.id)):state.tab==='feitas'?db.questions.filter(q=>db.done.includes(q.id)):pending();
+if(state.selectedBook)arr=arr.filter(q=>q.book===state.selectedBook);
+if(state.selectedSubject)arr=arr.filter(q=>q.subject===state.selectedSubject);
+return `<div class="layout"><aside class="panel side"><h3>Cadernos</h3>${side()}</aside><section class="view"><div class="stats"><div class="stat"><span>Acertos</span><strong>${db.stats.correct}</strong></div><div class="stat"><span>Erros</span><strong>${db.stats.wrong}</strong></div><div class="stat"><span>Desempenho</span><strong>${pct()}%</strong></div></div>${arr.length?arr.map(q=>question(q)).join(''):`<div class="panel empty">Nenhuma questão nesta seção.</div>`}</section></div>`
+}
+function side(){
+return db.books.map(b=>{let qs=db.questions.filter(q=>q.book===b.id), solved=qs.filter(q=>db.done.includes(q.id)).length;return `<div class="folder"><div class="folder-head" onclick="filterBook('${b.id}')"><b>${escape(b.name)}</b><span>${solved}/${qs.length}</span></div><div class="folder-body">${b.subjects.map(s=>{let x=qs.filter(q=>q.subject===s.id),d=x.filter(q=>db.done.includes(q.id)).length;return `<div class="subject" onclick="event.stopPropagation();filterSubject('${s.id}')"><span>${escape(s.name)}</span><span>${d}/${x.length}</span></div>`}).join('')}<button class="reset" onclick="event.stopPropagation();resetBook('${b.id}')">Resetar caderno</button></div></div>`}).join('')
+}
+function question(q){
+const options=q.options.map((o,i)=>`<label class="option"><input type="radio" name="${q.id}" value="${i}"> <span>${escape(o)}</span></label>`).join('');
+return `<article class="card question" id="question-${q.id}"><div class="meta"><span class="tag">${escape(bookName(q.book))}</span><span class="tag">${escape(subjectName(q.subject))}</span><span class="tag">${escape(q.board)}</span><span class="tag">${escape(q.format)}</span></div><div class="statement">${escape(q.statement)}</div><div class="options">${options}</div><div class="answer"><button onclick="answer('${q.id}')">Responder</button></div><div id="feedback-${q.id}"></div></article>`
+}
+function answer(id){
+const q=db.questions.find(x=>x.id===id), picked=document.querySelector(`input[name="${id}"]:checked`);
+if(!picked){document.getElementById('feedback-'+id).innerHTML='<div class="feedback bad">Selecione uma alternativa.</div>';return}
+const ok=+picked.value===q.answer;
+if(db.mode==='teacher'&&ok){
+document.getElementById('feedback-'+id).innerHTML=`<div class="teacher-box"><b>Justifique sua resposta</b><p>Explique com suas próprias palavras por que a alternativa escolhida está correta.</p><textarea id="why-${id}" placeholder="Digite sua justificativa..."></textarea><button class="primary" style="margin-top:9px" onclick="gradeJustification('${id}')">Enviar justificativa</button><div id="grade-${id}"></div></div>`;
+return}
+finish(id,ok)
+}
+function gradeJustification(id){
+const q=db.questions.find(x=>x.id===id), text=document.getElementById('why-'+id).value.trim();
+if(!text){document.getElementById('grade-'+id).innerHTML='<div class="feedback bad">Escreva uma justificativa antes de enviar.</div>';return}
+const terms=(q.explanation+' '+q.statement).toLowerCase().split(/\W+/).filter(x=>x.length>4);
+const words=text.toLowerCase().split(/\W+/);let hits=terms.filter(t=>words.includes(t)).length;
+let score=Math.min(100,Math.round(45+(hits/Math.max(1,Math.min(terms.length,8)))*55));
+const clear=text.length>=45?15:0; score=Math.min(100,score+clear);
+const ok=score>=70;
+document.getElementById('grade-'+id).innerHTML=`<div class="feedback ${ok?'good':'bad'}">Avaliação da justificativa: ${score}%. ${ok?'Clareza e certeza suficientes.':'A justificativa precisa de mais fundamentação e clareza; a questão foi enviada para a Área de Revisão.'}</div>`;
+if(ok)setTimeout(()=>finish(id,true),700);else {if(!db.review.includes(id))db.review.push(id);save()}
+}
+function finish(id,ok){
+const q=db.questions.find(x=>x.id===id);
+db.done=db.done.filter(x=>x!==id);db.review=db.review.filter(x=>x!==id);
+if(ok){db.done.push(id);db.stats.correct++}else{db.review.push(id);db.stats.wrong++}
+save();render();setTimeout(()=>{const next=document.querySelector('.question');if(next)next.scrollIntoView({behavior:'smooth',block:'start'})},60)
+}
+function jump(id){state.search='';render();setTimeout(()=>document.getElementById('question-'+id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+function search(v){state.search=v;render()}
+function go(t){state.tab=t;state.selectedBook=null;state.selectedSubject=null;render()}
+function filterBook(id){state.selectedBook=id;state.selectedSubject=null;render()}
+function filterSubject(id){state.selectedSubject=id;state.selectedBook=null;render()}
+function toggleTeacher(){db.mode=db.mode==='teacher'?'study':'teacher';save();render()}
+function resetBook(id){if(confirm('Resetar o progresso deste caderno?')){const ids=db.questions.filter(q=>q.book===id).map(q=>q.id);db.done=db.done.filter(x=>!ids.includes(x));db.review=db.review.filter(x=>!ids.includes(x));save();render()}}
+function manageView(){
+const selected=state.manageBook?db.books.find(b=>b.id===state.manageBook):db.books[0];if(selected&&!state.manageBook)state.manageBook=selected.id;
+const book=selected||db.books[0], subject=state.manageSubject?book.subjects.find(s=>s.id===state.manageSubject):null;
+const qs=db.questions.filter(q=>q.book===book?.id&&(subject?q.subject===subject.id:true));
+return `<div class="manage"><div class="panel"><div class="topline"><h3>Cadernos</h3><button class="primary" onclick="addBook()">+ Caderno</button></div>${db.books.map(b=>`<div class="list-item ${book?.id===b.id?'sel':''}" onclick="selectManageBook('${b.id}')"><b>${escape(b.name)}</b></div>`).join('')}<hr><h4>+All — importação estruturada</h4><div class="toolbar"><textarea id="allImport" placeholder="Caderno 1: matéria 1; matéria 2;"></textarea><button class="primary" onclick="importAll()">Importar</button></div></div>
+<div class="panel"><h3>Questões</h3><div class="topline"><span>${book?escape(book.name):''}${subject?' · '+escape(subject.name):''}</span><button class="primary" onclick="newQuestion()">+ Questão</button></div>${book?book.subjects.map(s=>`<div class="list-item ${subject?.id===s.id?'sel':''}" onclick="selectManageSubject('${s.id}')">${escape(s.name)} <small>(${db.questions.filter(q=>q.subject===s.id).length})</small></div>`).join(''):''}<hr>${qs.map(q=>`<div class="list-item" onclick="editQuestion('${q.id}')">${escape(q.statement.slice(0,80))}${q.statement.length>80?'…':''}</div>`).join('')||'<div class="empty">Nenhuma questão.</div>'}</div>
+<div class="panel formpanel" id="editor"><div class="empty">Selecione uma questão ou clique em “+ Questão”.</div></div></div>`
+}
+function selectManageBook(id){state.manageBook=id;state.manageSubject=null;render()}
+function selectManageSubject(id){state.manageSubject=id;render()}
+function addBook(){const n=prompt('Nome do caderno:');if(!n)return;db.books.push({id:'b'+Date.now(),name:n,subjects:[]});save();render()}
+function importAll(){const text=document.getElementById('allImport').value;const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);lines.forEach(line=>{const m=line.match(/^([^:]+):\s*(.+)$/);if(!m)return;let b=db.books.find(x=>x.name.toLowerCase()===m[1].trim().toLowerCase());if(!b){b={id:'b'+Date.now()+Math.random(),name:m[1].trim(),subjects:[]};db.books.push(b)}m[2].split(';').map(x=>x.trim()).filter(Boolean).forEach(n=>{if(!b.subjects.some(s=>s.name.toLowerCase()===n.toLowerCase()))b.subjects.push({id:'s'+Date.now()+Math.random(),name:n,q:[]})})});save();render()}
+function newQuestion(){const b=db.books.find(x=>x.id===state.manageBook)||db.books[0];if(!b||!b.subjects.length){alert('Crie ao menos uma matéria no caderno selecionado.');return}editor({book:b.id,subject:b.subjects[0].id,board:'',format:'Múltipla Escolha',statement:'',options:['','','',''],answer:0,explanation:''})}
+function editQuestion(id){editor(db.questions.find(q=>q.id===id))}
+function editor(q){
+document.getElementById('editor').innerHTML=`<h3>${q.id?'Editar':'Nova'} questão</h3><div class="form-grid">
+<select id="fbook" onchange="refreshSubjects()">${db.books.map(b=>`<option value="${b.id}" ${b.id===q.book?'selected':''}>${escape(b.name)}</option>`).join('')}</select>
+<select id="fsubject">${db.books.find(b=>b.id===q.book).subjects.map(s=>`<option value="${s.id}" ${s.id===q.subject?'selected':''}>${escape(s.name)}</option>`).join('')}</select>
+<input id="fboard" placeholder="Banca" value="${escape(q.board)}"><select id="fformat"><option ${q.format==='Múltipla Escolha'?'selected':''}>Múltipla Escolha</option><option ${q.format==='Certo ou Errado'?'selected':''}>Certo ou Errado</option></select>
+<textarea class="full" id="fstatement" placeholder="Enunciado — use Enter para quebra de linha">${escape(q.statement)}</textarea>
+${q.options.map((o,i)=>`<input id="fo${i}" placeholder="Alternativa ${i+1}" value="${escape(o)}">`).join('')}
+<select id="fanswer">${q.options.map((o,i)=>`<option value="${i}" ${i===q.answer?'selected':''}>Gabarito: alternativa ${i+1}</option>`).join('')}</select>
+<textarea class="full" id="fexp" placeholder="Explicação manual da resposta">${escape(q.explanation)}</textarea>
+</div><div style="display:flex;gap:8px;margin-top:12px"><button class="primary" onclick="saveQuestion('${q.id||''}')">Salvar</button>${q.id?'<button class="danger" onclick="deleteQuestion(\\''+q.id+'\\')">Excluir</button>':''}</div>`
+}
+function refreshSubjects(){const b=db.books.find(x=>x.id===document.getElementById('fbook').value);document.getElementById('fsubject').innerHTML=b.subjects.map(s=>`<option value="${s.id}">${escape(s.name)}</option>`).join('')}
+function saveQuestion(id){
+const q={id:id||'q'+Date.now(),book:document.getElementById('fbook').value,subject:document.getElementById('fsubject').value,board:document.getElementById('fboard').value.trim(),format:document.getElementById('fformat').value,statement:document.getElementById('fstatement').value,options:[0,1,2,3].map(i=>document.getElementById('fo'+i).value),answer:+document.getElementById('fanswer').value,explanation:document.getElementById('fexp').value};
+const i=db.questions.findIndex(x=>x.id===q.id);if(i>=0)db.questions[i]=q;else db.questions.push(q);save();render();state.manageBook=q.book;state.manageSubject=q.subject;editQuestion(q.id)
+}
+function deleteQuestion(id){db.questions=db.questions.filter(q=>q.id!==id);db.done=db.done.filter(x=>x!==id);db.review=db.review.filter(x=>x!==id);save();render()}
+render();
+</script>
+</body>
+</html>
