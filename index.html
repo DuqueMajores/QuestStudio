@@ -144,6 +144,8 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
   .side{max-height:320px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}
   .stats{display:none}
 }
+
+.search .results{padding:6px 0}.search .result{padding:12px 14px}.search .result b{display:block;color:#1f3fbf;font-size:14px;line-height:1.35;font-weight:600}.search .result .snippet{display:block;margin-top:5px;color:#667085;font-size:12px;line-height:1.45}.search .result mark{background:#fff0a8;color:inherit;border-radius:2px;padding:0 1px}.editor-saved{display:inline-flex;align-items:center;color:#16794f;font-weight:700;font-size:13px}
 </style>
 </head>
 <body>
@@ -296,23 +298,32 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
     }
   }
 
+  function normalizeSearchText(value) {
+    return String(value == null ? '' : value).toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  }
+  function questionSearchText(q) {
+    var alternatives=Array.isArray(q.options)?q.options.join(' '):'';
+    return [q.statement,alternatives,q.board,q.year,q.format,q.explanation,subjectName(q.subject),bookName(q.book)].join(' ');
+  }
+  function highlightSearch(text,query) {
+    var clean=String(text||''),words=String(query||'').trim().split(/\s+/).filter(Boolean).slice(0,8);
+    if(!words.length)return esc(clean);
+    var pattern=words.map(function(w){return w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|');
+    var re=new RegExp('('+pattern+')','ig');
+    return clean.split(re).map(function(part,i){return i%2?'<mark>'+esc(part)+'</mark>':esc(part);}).join('');
+  }
   function searchResults() {
-    var term = state.search.toLowerCase().trim();
-    if (!term) return '';
-    var words = term.split(/\s+/).filter(Boolean);
-    var arr = db.questions.filter(function(q) {
-      var hay = (q.statement+' '+q.explanation+' '+q.board+' '+subjectName(q.subject)+' '+bookName(q.book)).toLowerCase();
-      return words.every(function(w){ return hay.indexOf(w) >= 0; });
-    }).slice(0,20);
-
-    return '<div class="results">' +
-      (arr.length ? arr.map(function(q) {
-        return '<div class="result" data-jump="' + esc(q.id) + '">' +
-          '<b>' + esc(q.statement.slice(0,90)) + (q.statement.length>90?'…':'') + '</b>' +
-          '<small>' + esc(bookName(q.book)) + ' · ' + esc(subjectName(q.subject)) + '</small>' +
-        '</div>';
-      }).join('') : '<div class="result">Nenhuma questão encontrada.</div>') +
-    '</div>';
+    var query=state.search.trim();if(!query)return '';
+    var normalizedQuery=normalizeSearchText(query),words=normalizedQuery.split(/\s+/).filter(Boolean);
+    var arr=db.questions.map(function(q){
+      var hay=normalizeSearchText(questionSearchText(q)),score=0;
+      if(hay.indexOf(normalizedQuery)>=0)score+=100;
+      words.forEach(function(w){if(hay.indexOf(w)>=0)score+=10;});
+      var st=normalizeSearchText(q.statement),op=normalizeSearchText(Array.isArray(q.options)?q.options.join(' '):''),ba=normalizeSearchText(q.board),ye=normalizeSearchText(q.year);
+      if(st.indexOf(normalizedQuery)>=0)score+=35;if(op.indexOf(normalizedQuery)>=0)score+=25;if(ba.indexOf(normalizedQuery)>=0)score+=20;if(ye.indexOf(normalizedQuery)>=0)score+=20;
+      return {q:q,score:score,hay:hay};
+    }).filter(function(x){return words.every(function(w){return x.hay.indexOf(w)>=0;});}).sort(function(a,b){return b.score-a.score;}).slice(0,20);
+    return '<div class="results">'+(arr.length?arr.map(function(x){var q=x.q,text=q.statement||'',snippet=text.length>155?text.slice(0,155)+'…':text,meta=[q.board||'',q.year||'',subjectName(q.subject)||'',bookName(q.book)||''].filter(Boolean).join(' · ');return '<div class="result" data-jump="'+esc(q.id)+'"><b>'+highlightSearch(snippet,query)+'</b><span class="snippet">'+highlightSearch(meta,query)+'</span></div>';}).join(''):'<div class="result"><b>Nenhuma questão encontrada</b><span class="snippet">Tente outra palavra ou frase.</span></div>')+'</div>';
   }
 
   function studyView() {
@@ -644,43 +655,31 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
   }
 
   function editor(q){
-    var panel=document.getElementById('editor'); if(!panel)return;
-    var b=db.books.filter(function(x){return x.id===q.book;})[0]||db.books[0];
-    panel.innerHTML='<h3>'+(q.id?'Editar':'Nova')+' questão</h3><div class="form-grid">' +
-      '<select id="fbook">'+db.books.map(function(x){return '<option value="'+esc(x.id)+'" '+(x.id===b.id?'selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select>' +
-      '<select id="fsubject">'+(b.subjects||[]).map(function(s){return '<option value="'+esc(s.id)+'" '+(s.id===q.subject?'selected':'')+'>'+esc(s.name)+'</option>';}).join('')+'</select>' +
-      '<input id="fboard" placeholder="Banca" value="'+esc(q.board)+'">' +
-      '<select id="fformat"><option '+(q.format==='Múltipla Escolha'?'selected':'')+'>Múltipla Escolha</option><option '+(q.format==='Certo ou Errado'?'selected':'')+'>Certo ou Errado</option></select>' +
-      '<textarea class="full" id="fstatement" placeholder="Enunciado — use Enter para quebra de linha">'+esc(q.statement)+'</textarea>' +
-      q.options.map(function(o,i){return '<input id="fo'+i+'" placeholder="Alternativa '+(i+1)+'" value="'+esc(o)+'">';}).join('') +
-      '<select id="fanswer">'+q.options.map(function(o,i){return '<option value="'+i+'" '+(i===q.answer?'selected':'')+'>Gabarito: alternativa '+(i+1)+'</option>';}).join('')+'</select>' +
-      '<textarea class="full" id="fexp" placeholder="Explicação manual da resposta">'+esc(q.explanation)+'</textarea>' +
-      '</div><div style="display:flex;gap:8px;margin-top:12px"><button class="primary" id="saveQ">Salvar</button>'+(q.id?'<button class="danger" id="deleteQ">Excluir</button>':'')+'</div>';
-
-    document.getElementById('fbook').onchange=function(){
-      var nb=db.books.filter(function(x){return x.id===this.value;},this)[0];
-      document.getElementById('fsubject').innerHTML=(nb.subjects||[]).map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>';}).join('');
-    };
+    var panel=document.getElementById('editor');if(!panel)return;
+    var b=db.books.filter(function(x){return x.id===q.book;})[0]||db.books[0],isCE=q.format==='Certo ou Errado';
+    var opts=isCE?(q.options&&q.options.length>=2?[q.options[0]||'Certo',q.options[1]||'Errado']:['Certo','Errado']):(q.options&&q.options.length?q.options:['','','','']);
+    panel.innerHTML='<h3>'+(q.id?'Editar':'Nova')+' questão</h3><div class="form-grid">'+
+      '<select id="fbook">'+db.books.map(function(x){return '<option value="'+esc(x.id)+'" '+(x.id===b.id?'selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select>'+
+      '<select id="fsubject">'+(b.subjects||[]).map(function(s){return '<option value="'+esc(s.id)+'" '+(s.id===q.subject?'selected':'')+'>'+esc(s.name)+'</option>';}).join('')+'</select>'+
+      '<input id="fboard" placeholder="Banca" value="'+esc(q.board||'')+'"><input id="fyear" placeholder="Ano" value="'+esc(q.year||'')+'">'+
+      '<select id="fformat"><option '+(q.format==='Múltipla Escolha'?'selected':'')+'>Múltipla Escolha</option><option '+(isCE?'selected':'')+'>Certo ou Errado</option></select>'+
+      '<textarea class="full" id="fstatement" placeholder="Enunciado — use Enter para quebra de linha">'+esc(q.statement||'')+'</textarea>'+
+      '<div class="full" id="optionsBox">'+renderOptionInputs(opts,isCE)+'</div>'+
+      '<select id="fanswer">'+(isCE?'<option value="0" '+(q.answer===0?'selected':'')+'>Gabarito: Certo</option><option value="1" '+(q.answer===1?'selected':'')+'>Gabarito: Errado</option>':opts.map(function(o,i){return '<option value="'+i+'" '+(i===q.answer?'selected':'')+'>Gabarito: alternativa '+(i+1)+'</option>';}).join(''))+'</select>'+
+      '<textarea class="full" id="fexp" placeholder="Explicação manual da resposta">'+esc(q.explanation||'')+'</textarea>'+
+      '</div><div style="display:flex;align-items:center;gap:10px;margin-top:12px"><button class="primary" id="saveQ">Salvar</button><span id="savedMsg"></span></div>';
+    document.getElementById('fbook').onchange=function(){var nb=db.books.filter(function(x){return x.id===this.value;},this)[0];document.getElementById('fsubject').innerHTML=(nb.subjects||[]).map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>';}).join('');};
+    document.getElementById('fformat').onchange=function(){var ce=this.value==='Certo ou Errado',current=[];for(var i=0;i<4;i++){var el=document.getElementById('fo'+i);if(el)current.push(el.value);}var vals=ce?['Certo','Errado']:(current.length>=4?current:['','','','']);document.getElementById('optionsBox').innerHTML=renderOptionInputs(vals,ce);document.getElementById('fanswer').innerHTML=ce?'<option value="0">Gabarito: Certo</option><option value="1">Gabarito: Errado</option>':vals.map(function(o,i){return '<option value="'+i+'">Gabarito: alternativa '+(i+1)+'</option>';}).join('');};
     document.getElementById('saveQ').onclick=function(){saveQuestion(q.id||'');};
-    var del=document.getElementById('deleteQ'); if(del)del.onclick=function(){deleteQuestion(q.id);};
   }
+  function renderOptionInputs(opts,isCE){return opts.map(function(o,i){return '<input id="fo'+i+'" placeholder="'+(isCE?(i===0?'Certo':'Errado'):'Alternativa '+(i+1))+'" value="'+esc(o)+'">';}).join('');}
 
   function saveQuestion(id){
-    var q={
-      id:id||'q'+Date.now(),
-      book:document.getElementById('fbook').value,
-      subject:document.getElementById('fsubject').value,
-      board:document.getElementById('fboard').value.trim(),
-      format:document.getElementById('fformat').value,
-      statement:document.getElementById('fstatement').value,
-      options:[0,1,2,3].map(function(i){return document.getElementById('fo'+i).value;}),
-      answer:Number(document.getElementById('fanswer').value),
-      explanation:document.getElementById('fexp').value
-    };
-    var idx=db.questions.findIndex(function(x){return x.id===q.id;});
-    if(idx>=0)db.questions[idx]=q;else db.questions.push(q);
-    state.manageBook=q.book;state.manageSubject=q.subject;
-    save();render();editQuestion(q.id);
+    var format=document.getElementById('fformat').value,isCE=format==='Certo ou Errado';
+    var options=isCE?[document.getElementById('fo0').value||'Certo',document.getElementById('fo1').value||'Errado']:[0,1,2,3].map(function(i){var el=document.getElementById('fo'+i);return el?el.value:'';});
+    var q={id:id||'q'+Date.now(),book:document.getElementById('fbook').value,subject:document.getElementById('fsubject').value,board:document.getElementById('fboard').value.trim(),year:document.getElementById('fyear').value.trim(),format:format,statement:document.getElementById('fstatement').value,options:options,answer:Number(document.getElementById('fanswer').value),explanation:document.getElementById('fexp').value};
+    var idx=db.questions.findIndex(function(x){return x.id===q.id;});if(idx>=0)db.questions[idx]=q;else db.questions.push(q);state.manageBook=q.book;state.manageSubject=q.subject;save();
+    render();setTimeout(function(){editQuestion(q.id);var m=document.getElementById('savedMsg');if(m){m.className='editor-saved';m.textContent='Salvo';}},0);
   }
 
   function deleteQuestion(id){
