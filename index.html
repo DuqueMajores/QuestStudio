@@ -52,6 +52,19 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
 .layout{display:grid;grid-template-columns:275px minmax(0,1fr);gap:20px}
 .panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .side{padding:15px;max-height:calc(100vh - 160px);overflow:auto}
+.layout .side{background:#171a1f;border-color:#242932;color:#f3f4f6}
+.layout .side h3{color:#fff}
+.layout .side .folder{background:#1d2128;border-color:#2b313a}
+.layout .side .folder-head:hover{background:#232832}
+.layout .side .folder-head b{color:#f3f4f6}
+.layout .side .folder-head span,.layout .side .subject span:last-child{color:#9ca3af}
+.layout .side .subject{color:#c5cad3}
+.layout .side .subject:hover{color:#a5b4fc}
+.layout .side .reset{color:#fca5a5}
+.layout .side::-webkit-scrollbar{width:7px}
+.layout .side::-webkit-scrollbar-track{background:transparent}
+.layout .side::-webkit-scrollbar-thumb{background:#3b424d;border-radius:10px}
+.layout .side::-webkit-scrollbar-thumb:hover{background:#4b5563}
 .side h3,.section-title{margin:1px 0 13px;font-size:14px}
 .folder{border:1px solid var(--line);border-radius:9px;margin-bottom:8px;overflow:hidden;background:#fff}
 .folder-head{padding:10px 11px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
@@ -109,7 +122,9 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
 .form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:#b7bdf7;box-shadow:0 0 0 3px rgba(79,70,229,.07)}
 .form-grid textarea{min-height:105px}
 .full{grid-column:1/-1}
-.danger{background:var(--bad-soft);color:var(--bad);border:1px solid #f4d2cf;border-radius:8px;padding:8px 10px}
+.danger,.icon-action{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;background:#fff0f0;color:#b42318;border:1px solid #f4d2cf;border-radius:7px;padding:0;font-size:15px;line-height:1}
+.icon-action.reset-action{background:#f5f7ff;color:#4f46e5;border-color:#d8dcff}
+.icon-action:hover{filter:brightness(.97)}
 .secondary{background:#fff;color:#4b5563;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .secondary:hover{background:#fafafa}
 .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;gap:10px}
@@ -117,6 +132,7 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
 .manage-subtitle{font-size:12px;color:var(--muted);margin:-7px 0 12px}
 .section-divider{border:0;border-top:1px solid var(--line);margin:14px 0}
 .action-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.action-group{display:flex;align-items:center;gap:5px;flex-shrink:0}
 @media(max-width:1100px){
   header{padding:0 18px}.metrics{display:none}.search{width:40vw}
   main{padding:20px}.layout{grid-template-columns:235px 1fr}
@@ -252,8 +268,8 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
       '</header>' +
       '<nav>' +
         tabButton('estudar','Estudar') +
-        tabButton('revisao','Área de Revisão') +
-        tabButton('feitas','Questões Feitas') +
+        tabButton('revisao','Revisão') +
+        tabButton('feitas','Questões') +
         tabButton('gerenciar','Gerenciar Conteúdo') +
       '</nav>' +
       '<main>' + (state.tab === 'gerenciar' ? manageView() : studyView()) + '</main>';
@@ -361,7 +377,6 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
             var d = x.filter(function(q){return db.done.indexOf(q.id)!==-1;}).length;
             return '<div class="subject" data-subject="'+esc(s.id)+'"><span>'+esc(s.name)+'</span><span>'+d+'/'+x.length+'</span></div>';
           }).join('') +
-          '<button class="reset" data-reset="'+esc(b.id)+'">Resetar caderno</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -478,8 +493,10 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
         '<div class="manage-subtitle">Organize suas matérias e questões.</div>' +
         db.books.map(function(b){
           return '<div class="list-item '+(book&&book.id===b.id?'sel':'')+'" data-manage-book="'+esc(b.id)+'">' +
-            '<b>'+esc(b.name)+'</b><button class="danger" title="Excluir caderno" data-delete-book="'+esc(b.id)+'">Excluir</button>' +
-          '</div>';
+            '<b>'+esc(b.name)+'</b><span class="action-group">' +
+            '<button class="icon-action reset-action" title="Resetar caderno" data-reset-book="'+esc(b.id)+'" aria-label="Resetar caderno">↻</button>' +
+            '<button class="icon-action" title="Excluir caderno" data-delete-book="'+esc(b.id)+'" aria-label="Excluir caderno">⌫</button>' +
+            '</span></div>';
         }).join('') +
         '<hr class="section-divider"><h4>+All — importação estruturada</h4>' +
         '<div class="toolbar"><textarea id="allImport" placeholder="Caderno 1: matéria 1; matéria 2;"></textarea><button class="primary" id="importBtn">Importar</button></div>' +
@@ -490,12 +507,14 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
         (book ? book.subjects.map(function(s){
           return '<div class="list-item '+(subject&&subject.id===s.id?'sel':'')+'" data-manage-subject="'+esc(s.id)+'">' +
             '<span>'+esc(s.name)+' <small>('+db.questions.filter(function(q){return q.subject===s.id;}).length+')</small></span>' +
-            '<button class="danger" title="Excluir matéria" data-delete-subject="'+esc(s.id)+'">Excluir</button>' +
-          '</div>';
+            '<span class="action-group">' +
+            '<button class="icon-action reset-action" title="Resetar matéria" data-reset-subject="'+esc(s.id)+'" aria-label="Resetar matéria">↻</button>' +
+            '<button class="icon-action" title="Excluir matéria" data-delete-subject="'+esc(s.id)+'" aria-label="Excluir matéria">⌫</button>' +
+            '</span></div>';
         }).join('') : '') +
         '<hr class="section-divider">' +
         (qs.map(function(q){
-          return '<div class="list-item" data-edit="'+esc(q.id)+'"><span>'+esc(q.statement.slice(0,80))+(q.statement.length>80?'…':'')+'</span><button class="danger" title="Excluir questão" data-delete-question="'+esc(q.id)+'">Excluir</button></div>';
+          return '<div class="list-item" data-edit="'+esc(q.id)+'"><span>'+esc(q.statement.slice(0,80))+(q.statement.length>80?'…':'')+'</span><span class="action-group"><button class="icon-action" title="Excluir questão" data-delete-question="'+esc(q.id)+'" aria-label="Excluir questão">⌫</button></span></div>';
         }).join('') || '<div class="empty">Nenhuma questão.</div>') +
       '</div>' +
       '<div class="panel formpanel" id="editor"><div class="empty">Selecione uma questão ou clique em “+ Questão”.</div></div>' +
@@ -527,6 +546,36 @@ main{padding:24px 28px;max-width:1480px;margin:auto}
     document.querySelectorAll('[data-delete-question]').forEach(function(el){
       el.onclick=function(e){e.stopPropagation();deleteQuestion(this.getAttribute('data-delete-question'));};
     });
+    document.querySelectorAll('[data-reset-book]').forEach(function(el){
+      el.onclick=function(e){e.stopPropagation();resetBookManager(this.getAttribute('data-reset-book'));};
+    });
+    document.querySelectorAll('[data-reset-subject]').forEach(function(el){
+      el.onclick=function(e){e.stopPropagation();resetSubjectManager(this.getAttribute('data-reset-subject'));};
+    });
+  }
+
+  function resetBookManager(id){
+    var b=db.books.filter(function(x){return x.id===id;})[0];
+    if(!b)return;
+    if(!confirm('Resetar todas as questões do caderno "'+b.name+'" para o estado inicial?'))return;
+    var ids=db.questions.filter(function(q){return q.book===id;}).map(function(q){return q.id;});
+    db.done=db.done.filter(function(x){return ids.indexOf(x)===-1;});
+    db.review=db.review.filter(function(x){return ids.indexOf(x)===-1;});
+    save();render();
+  }
+
+  function resetSubjectManager(id){
+    var s=null;
+    for(var i=0;i<db.books.length;i++){
+      var found=db.books[i].subjects.filter(function(x){return x.id===id;})[0];
+      if(found){s=found;break;}
+    }
+    if(!s)return;
+    if(!confirm('Resetar todas as questões da matéria "'+s.name+'" para o estado inicial?'))return;
+    var ids=db.questions.filter(function(q){return q.subject===id;}).map(function(q){return q.id;});
+    db.done=db.done.filter(function(x){return ids.indexOf(x)===-1;});
+    db.review=db.review.filter(function(x){return ids.indexOf(x)===-1;});
+    save();render();
   }
 
   function deleteBook(id){
