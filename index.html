@@ -5,144 +5,645 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>QuestStudio</title>
 <style>
-:root{--bg:#f5f7fb;--panel:#fff;--text:#18212f;--muted:#667085;--line:#e5e7eb;--primary:#4f46e5;--primary2:#4338ca;--good:#168a5a;--bad:#d14343;--shadow:0 10px 30px rgba(16,24,40,.07)}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
-button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}
-header{height:76px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:0 24px;position:sticky;top:0;z-index:20}
-.brand{font-size:22px;font-weight:800;cursor:pointer;white-space:nowrap}.metrics{display:flex;gap:12px;margin-left:auto}.metric{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13px}.metric b{font-size:15px}.prof{display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}.prof.active{background:#eef2ff;color:var(--primary);border-color:#c7d2fe}
-.search{position:relative;width:min(360px,32vw)}.search input{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;outline:none;background:#fafafa}.search input:focus{border-color:#a5b4fc;background:#fff}.results{position:absolute;top:47px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;max-height:430px;overflow-y:auto}.result{padding:12px 14px;border-bottom:1px solid #f0f1f3;cursor:pointer}.result:hover{background:#f8faff}.result small{color:var(--muted);display:block;margin-top:4px}
-nav{background:#fff;border-bottom:1px solid var(--line);display:flex;padding:0 24px;gap:6px;position:sticky;top:76px;z-index:15}.tab{padding:15px 17px;border:0;background:none;color:var(--muted);border-bottom:2px solid transparent}.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
-main{padding:24px;max-width:1500px;margin:auto}.layout{display:grid;grid-template-columns:300px 1fr;gap:20px}.panel,.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}.side{padding:16px;max-height:calc(100vh - 140px);overflow:auto}.side h3,.section-title{margin:0 0 12px}.folder{border:1px solid var(--line);border-radius:10px;margin-bottom:9px;overflow:hidden}.folder-head{padding:11px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.folder-head b{font-weight:800}.folder-body{padding:0 12px 10px}.subject{padding:7px 0;color:#475467;cursor:pointer;display:flex;justify-content:space-between}.subject:hover{text-decoration:underline}.reset{font-size:11px;border:0;background:#fff0f0;color:var(--bad);padding:5px 7px;border-radius:6px}
-.view{min-width:0}.hero{padding:22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.stat{padding:16px;background:#fff;border:1px solid var(--line);border-radius:12px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{font-size:26px}
-.question{padding:22px;margin-bottom:14px}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.tag{background:#eef2ff;color:#3730a3;padding:5px 8px;border-radius:7px;font-size:12px}.statement{font-size:17px;line-height:1.65;white-space:pre-wrap;margin:14px 0}.options{display:grid;gap:9px}.option{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:left;background:#fff}.option:hover{border-color:#a5b4fc}.option input{margin-top:4px}.answer{margin-top:14px}.answer button,.primary{border:0;background:var(--primary);color:#fff;padding:10px 15px;border-radius:9px}.answer button:hover,.primary:hover{background:var(--primary2)}.feedback{margin-top:13px;padding:13px;border-radius:9px}.good{background:#ecfdf3;color:#067647}.bad{background:#fef3f2;color:#b42318}.explanation{margin-top:10px;color:#475467;line-height:1.55}
-.teacher-box{margin-top:15px;padding:15px;border:1px solid #c7d2fe;background:#f8faff;border-radius:10px}.teacher-box textarea{width:100%;min-height:120px;resize:vertical;padding:11px;border:1px solid var(--line);border-radius:9px}.review-score{margin-top:10px;font-weight:700}
-.empty{padding:45px;text-align:center;color:var(--muted)}.manage{display:grid;grid-template-columns:300px 1fr 1fr;gap:14px}.manage .panel{padding:16px;min-height:500px;overflow:auto}.list-item{padding:9px 10px;border-radius:8px;cursor:pointer}.list-item:hover,.list-item.sel{background:#eef2ff}.list-item b{font-weight:800}.toolbar{display:flex;gap:8px;margin-bottom:12px}.toolbar textarea{flex:1;min-height:90px;padding:10px;border:1px solid var(--line);border-radius:9px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-grid input,.form-grid select,.form-grid textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px}.form-grid textarea{min-height:110px}.full{grid-column:1/-1}.danger{background:#fff0f0;color:#b42318;border:0;border-radius:8px;padding:8px 10px}.topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-@media(max-width:1000px){header{gap:10px;padding:0 12px}.metrics{display:none}.search{width:38vw}.layout{grid-template-columns:240px 1fr}.manage{grid-template-columns:1fr 1fr}.manage .formpanel{grid-column:1/-1}}
-@media(max-width:700px){header{height:auto;min-height:70px;flex-wrap:wrap;padding:10px 12px}.search{order:3;width:100%}nav{top:0;overflow:auto}.layout,.manage{grid-template-columns:1fr}main{padding:12px}.side{max-height:340px}.stats{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+:root{
+  --bg:#f6f7f9;
+  --surface:#ffffff;
+  --surface-2:#fafbfc;
+  --text:#171a1f;
+  --muted:#6b7280;
+  --line:#e6e8ec;
+  --line-strong:#d7dae0;
+  --primary:#4f46e5;
+  --primary-soft:#eef2ff;
+  --good:#16794f;
+  --good-soft:#ecfdf3;
+  --bad:#b42318;
+  --bad-soft:#fef3f2;
+  --shadow:0 8px 24px rgba(15,23,42,.045);
+  --radius:12px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+header{height:70px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 28px;position:sticky;top:0;z-index:30}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.03em;cursor:pointer;white-space:nowrap}
+.search{position:relative;width:min(390px,34vw)}
+.search input{width:100%;height:40px;padding:0 13px;border:1px solid var(--line);border-radius:9px;outline:none;background:var(--surface-2);transition:.15s}
+.search input:focus{border-color:#b7bdf7;background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,.08)}
+.results{position:absolute;top:46px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 35px rgba(15,23,42,.10);overflow:hidden;max-height:430px;overflow-y:auto}
+.result{padding:12px 13px;border-bottom:1px solid #f0f1f3;cursor:pointer}
+.result:last-child{border-bottom:0}
+.result:hover{background:#f8f9fc}
+.result small{color:var(--muted);display:block;margin-top:4px}
+.metrics{display:flex;gap:8px;margin-left:auto}
+.metric{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:12px;color:var(--muted)}
+.metric b{font-size:14px;color:var(--text);margin-left:3px}
+.prof{display:flex;align-items:center;gap:7px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:#4b5563}
+.prof:hover{border-color:var(--line-strong);background:#fafafa}
+.prof.active{background:var(--primary-soft);color:var(--primary);border-color:#cdd3ff}
+nav{background:#fff;border-bottom:1px solid var(--line);display:flex;padding:0 28px;gap:2px;position:sticky;top:70px;z-index:20}
+.tab{height:48px;padding:0 14px;border:0;background:none;color:var(--muted);border-bottom:2px solid transparent}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+main{padding:24px 28px;max-width:1480px;margin:auto}
+.layout{display:grid;grid-template-columns:275px minmax(0,1fr);gap:20px}
+.panel,.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.side{padding:15px;max-height:calc(100vh - 160px);overflow:auto}
+.side h3,.section-title{margin:1px 0 13px;font-size:14px}
+.folder{border:1px solid var(--line);border-radius:9px;margin-bottom:8px;overflow:hidden;background:#fff}
+.folder-head{padding:10px 11px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.folder-head:hover{background:#fafbfc}
+.folder-head b{font-weight:700}
+.folder-head span,.subject span:last-child{color:var(--muted);font-size:12px}
+.folder-body{padding:1px 11px 10px}
+.subject{padding:7px 0;color:#4b5563;cursor:pointer;display:flex;justify-content:space-between}
+.subject:hover{color:var(--primary)}
+.reset{font-size:11px;border:0;background:transparent;color:#b42318;padding:5px 0;margin-top:3px}
+.view{min-width:0}
+.question{padding:21px 22px;margin-bottom:12px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{background:#f3f4f6;color:#596273;padding:4px 7px;border-radius:6px;font-size:11px}
+.statement{font-size:16px;line-height:1.7;white-space:pre-wrap;margin:11px 0 15px;letter-spacing:-.005em}
+.options{display:grid;gap:7px}
+.option{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:11px;text-align:left;background:#fff;transition:.12s}
+.option:hover{border-color:#b9bdf0;background:#fcfcff}
+.option input{margin-top:3px;accent-color:var(--primary)}
+.answer{margin-top:13px}
+.answer button,.primary{border:0;background:var(--primary);color:#fff;padding:9px 13px;border-radius:8px;font-weight:600}
+.answer button:hover,.primary:hover{background:#4338ca}
+.feedback{margin-top:12px;padding:11px;border-radius:8px;font-size:13px;line-height:1.5}
+.good{background:var(--good-soft);color:var(--good)}
+.bad{background:var(--bad-soft);color:var(--bad)}
+.explanation{margin-top:9px;color:#475467;line-height:1.55}
+.teacher-box{margin-top:13px;padding:14px;border:1px solid #d7dcff;background:#fafbff;border-radius:9px}
+.teacher-box textarea{width:100%;min-height:115px;resize:vertical;padding:10px;border:1px solid var(--line);border-radius:8px;outline:none;margin-top:7px}
+.teacher-box textarea:focus{border-color:#b7bdf7;box-shadow:0 0 0 3px rgba(79,70,229,.07)}
+.empty{padding:55px 30px;text-align:center;color:var(--muted)}
+.filterbar{display:flex;align-items:center;gap:8px;margin-bottom:15px;flex-wrap:wrap}
+.filter-label{color:var(--muted);font-size:12px;font-weight:600;margin-right:2px}
+.filter-btn{border:1px solid var(--line);background:#fff;color:#596273;padding:7px 10px;border-radius:8px;font-size:12px}
+.filter-btn:hover{border-color:#cdd1d9}
+.filter-btn.active{background:var(--primary-soft);border-color:#cdd3ff;color:var(--primary);font-weight:700}
+.filter-spacer{flex:1}
+.manage{display:grid;grid-template-columns:275px minmax(280px,1fr) minmax(360px,1.15fr);gap:14px}
+.manage .panel{padding:15px;min-height:520px;height:calc(100vh - 170px);overflow:hidden}
+.manage .panel:nth-child(1),
+.manage .panel:nth-child(2),
+.manage .panel:nth-child(3){overflow-y:auto;overflow-x:hidden}
+.manage .panel::-webkit-scrollbar{width:7px}
+.manage .panel::-webkit-scrollbar-track{background:transparent}
+.manage .panel::-webkit-scrollbar-thumb{background:#d5d8df;border-radius:10px}
+.manage .panel::-webkit-scrollbar-thumb:hover{background:#bfc3cc}
+.list-item{padding:9px 10px;border-radius:8px;cursor:pointer;color:#4b5563;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.list-item:hover{background:#f6f7fb;color:var(--text)}
+.list-item.sel{background:var(--primary-soft);color:#3730a3}
+.list-item b{font-weight:800;color:var(--text)}
+.list-item small{color:var(--muted)}
+.toolbar{display:flex;gap:8px;margin-bottom:12px}
+.toolbar textarea{flex:1;min-height:78px;padding:9px;border:1px solid var(--line);border-radius:8px;resize:vertical}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.form-grid input,.form-grid select,.form-grid textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff;outline:none}
+.form-grid input:focus,.form-grid select:focus,.form-grid textarea:focus{border-color:#b7bdf7;box-shadow:0 0 0 3px rgba(79,70,229,.07)}
+.form-grid textarea{min-height:105px}
+.full{grid-column:1/-1}
+.danger{background:var(--bad-soft);color:var(--bad);border:1px solid #f4d2cf;border-radius:8px;padding:8px 10px}
+.secondary{background:#fff;color:#4b5563;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.secondary:hover{background:#fafafa}
+.topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;gap:10px}
+.manage-title{font-size:14px;font-weight:700}
+.manage-subtitle{font-size:12px;color:var(--muted);margin:-7px 0 12px}
+.section-divider{border:0;border-top:1px solid var(--line);margin:14px 0}
+.action-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:1100px){
+  header{padding:0 18px}.metrics{display:none}.search{width:40vw}
+  main{padding:20px}.layout{grid-template-columns:235px 1fr}
+  .manage{grid-template-columns:235px 1fr}.manage .formpanel{grid-column:1/-1}
+}
+@media(max-width:700px){
+  header{height:auto;min-height:70px;flex-wrap:wrap;padding:10px 12px}.search{order:3;width:100%}
+  nav{top:0;overflow:auto;padding:0 10px}.layout,.manage{grid-template-columns:1fr}main{padding:12px}
+  .side{max-height:320px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}
+  .stats{display:none}
+}
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app"><div style="padding:40px;font-family:Arial,sans-serif">Carregando QuestStudio...</div></div>
 <script>
-const KEY='queststudio-v1';
-const seed={
-books:[
-{id:'b1',name:'Caderno 1',subjects:[
-{id:'s1',name:'Lógica de Programação',q:[]},
-{id:'s2',name:'Banco de Dados',q:[]}]},
-{id:'b2',name:'Caderno 2',subjects:[
-{id:'s3',name:'Engenharia de Software',q:[]},
-{id:'s4',name:'Redes',q:[]}]}
-],
-questions:[
-{id:'q1',book:'b1',subject:'s1',board:'Cesgranrio',format:'Múltipla Escolha',statement:'Qual estrutura de repetição é normalmente usada quando a quantidade de iterações é conhecida previamente?',options:['for','switch','try/catch','class'],answer:0,explanation:'O laço for é apropriado quando a repetição pode ser controlada por um contador ou uma condição inicial/final.'},
-{id:'q2',book:'b1',subject:'s2',board:'Cesgranrio',format:'Certo ou Errado',statement:'Uma chave primária identifica unicamente cada registro de uma tabela.',options:['Certo','Errado'],answer:0,explanation:'A chave primária deve identificar cada linha de forma única.'},
-{id:'q3',book:'b2',subject:'s3',board:'FCC',format:'Múltipla Escolha',statement:'Qual modelo de desenvolvimento organiza o projeto em etapas sequenciais?',options:['Cascata','Scrum','Kanban','XP'],answer:0,explanation:'O modelo Cascata organiza o desenvolvimento em fases sequenciais.'},
-{id:'q4',book:'b2',subject:'s4',board:'FGV',format:'Certo ou Errado',statement:'O protocolo HTTP é usado na camada de aplicação da arquitetura TCP/IP.',options:['Certo','Errado'],answer:0,explanation:'HTTP é um protocolo da camada de aplicação.'}
-],
-done:[],review:[],stats:{correct:0,wrong:0},mode:'study'
-};
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||seed;
-if(!db.questions.length) db=seed;
-let state={tab:'estudar',search:'',selectedBook:null,selectedSubject:null,manageBook:null,manageSubject:null};
-function save(){localStorage.setItem(KEY,JSON.stringify(db))}
-function subjectName(id){for(const b of db.books){const s=b.subjects.find(x=>x.id===id);if(s)return s.name}return ''}
-function bookName(id){return db.books.find(x=>x.id===id)?.name||''}
-function pending(){return db.questions.filter(q=>!db.done.includes(q.id)&&!db.review.includes(q.id))}
-function escape(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function pct(){const t=db.stats.correct+db.stats.wrong;return t?Math.round(db.stats.correct/t*100):0}
-function render(){
-document.getElementById('app').innerHTML=`
-<header><div class="brand" onclick="go('estudar')">QuestStudio</div>
-<div class="search"><input value="${escape(state.search)}" placeholder="Pesquisar questões..." oninput="search(this.value)" onkeydown="if(event.key==='Escape')search('')">${state.search?results():''}</div>
-<div class="metrics"><div class="metric">Acertos <b>${db.stats.correct}</b></div><div class="metric">Erros <b>${db.stats.wrong}</b></div><div class="metric">Desempenho <b>${pct()}%</b></div></div>
-<button class="prof ${db.mode==='teacher'?'active':''}" onclick="toggleTeacher()">🎓 Modo Professor</button></header>
-<nav>${[['estudar','Estudar'],['revisao','Área de Revisão'],['feitas','Questões Feitas'],['gerenciar','Gerenciar Conteúdo']].map(x=>`<button class="tab ${state.tab===x[0]?'active':''}" onclick="go('${x[0]}')">${x[1]}</button>`).join('')}</nav>
-<main>${state.tab==='gerenciar'?manageView():studyView()}</main>`;
-}
-function results(){
-const term=state.search.toLowerCase().trim(); if(!term)return '';
-const arr=db.questions.filter(q=>(q.statement+' '+q.explanation+' '+q.board+' '+subjectName(q.subject)+' '+bookName(q.book)).toLowerCase().includes(term)).slice(0,20);
-return `<div class="results">${arr.length?arr.map(q=>`<div class="result" onclick="jump('${q.id}')"><b>${escape(q.statement.slice(0,90))}${q.statement.length>90?'…':''}</b><small>${escape(bookName(q.book))} · ${escape(subjectName(q.subject))}</small></div>`).join(''):'<div class="result">Nenhuma questão encontrada.</div>'}</div>`
-}
-function studyView(){
-let arr=state.tab==='revisao'?db.questions.filter(q=>db.review.includes(q.id)):state.tab==='feitas'?db.questions.filter(q=>db.done.includes(q.id)):pending();
-if(state.selectedBook)arr=arr.filter(q=>q.book===state.selectedBook);
-if(state.selectedSubject)arr=arr.filter(q=>q.subject===state.selectedSubject);
-return `<div class="layout"><aside class="panel side"><h3>Cadernos</h3>${side()}</aside><section class="view"><div class="stats"><div class="stat"><span>Acertos</span><strong>${db.stats.correct}</strong></div><div class="stat"><span>Erros</span><strong>${db.stats.wrong}</strong></div><div class="stat"><span>Desempenho</span><strong>${pct()}%</strong></div></div>${arr.length?arr.map(q=>question(q)).join(''):`<div class="panel empty">Nenhuma questão nesta seção.</div>`}</section></div>`
-}
-function side(){
-return db.books.map(b=>{let qs=db.questions.filter(q=>q.book===b.id), solved=qs.filter(q=>db.done.includes(q.id)).length;return `<div class="folder"><div class="folder-head" onclick="filterBook('${b.id}')"><b>${escape(b.name)}</b><span>${solved}/${qs.length}</span></div><div class="folder-body">${b.subjects.map(s=>{let x=qs.filter(q=>q.subject===s.id),d=x.filter(q=>db.done.includes(q.id)).length;return `<div class="subject" onclick="event.stopPropagation();filterSubject('${s.id}')"><span>${escape(s.name)}</span><span>${d}/${x.length}</span></div>`}).join('')}<button class="reset" onclick="event.stopPropagation();resetBook('${b.id}')">Resetar caderno</button></div></div>`}).join('')
-}
-function question(q){
-const options=q.options.map((o,i)=>`<label class="option"><input type="radio" name="${q.id}" value="${i}"> <span>${escape(o)}</span></label>`).join('');
-return `<article class="card question" id="question-${q.id}"><div class="meta"><span class="tag">${escape(bookName(q.book))}</span><span class="tag">${escape(subjectName(q.subject))}</span><span class="tag">${escape(q.board)}</span><span class="tag">${escape(q.format)}</span></div><div class="statement">${escape(q.statement)}</div><div class="options">${options}</div><div class="answer"><button onclick="answer('${q.id}')">Responder</button></div><div id="feedback-${q.id}"></div></article>`
-}
-function answer(id){
-const q=db.questions.find(x=>x.id===id), picked=document.querySelector(`input[name="${id}"]:checked`);
-if(!picked){document.getElementById('feedback-'+id).innerHTML='<div class="feedback bad">Selecione uma alternativa.</div>';return}
-const ok=+picked.value===q.answer;
-if(db.mode==='teacher'&&ok){
-document.getElementById('feedback-'+id).innerHTML=`<div class="teacher-box"><b>Justifique sua resposta</b><p>Explique com suas próprias palavras por que a alternativa escolhida está correta.</p><textarea id="why-${id}" placeholder="Digite sua justificativa..."></textarea><button class="primary" style="margin-top:9px" onclick="gradeJustification('${id}')">Enviar justificativa</button><div id="grade-${id}"></div></div>`;
-return}
-finish(id,ok)
-}
-function gradeJustification(id){
-const q=db.questions.find(x=>x.id===id), text=document.getElementById('why-'+id).value.trim();
-if(!text){document.getElementById('grade-'+id).innerHTML='<div class="feedback bad">Escreva uma justificativa antes de enviar.</div>';return}
-const terms=(q.explanation+' '+q.statement).toLowerCase().split(/\W+/).filter(x=>x.length>4);
-const words=text.toLowerCase().split(/\W+/);let hits=terms.filter(t=>words.includes(t)).length;
-let score=Math.min(100,Math.round(45+(hits/Math.max(1,Math.min(terms.length,8)))*55));
-const clear=text.length>=45?15:0; score=Math.min(100,score+clear);
-const ok=score>=70;
-document.getElementById('grade-'+id).innerHTML=`<div class="feedback ${ok?'good':'bad'}">Avaliação da justificativa: ${score}%. ${ok?'Clareza e certeza suficientes.':'A justificativa precisa de mais fundamentação e clareza; a questão foi enviada para a Área de Revisão.'}</div>`;
-if(ok)setTimeout(()=>finish(id,true),700);else {if(!db.review.includes(id))db.review.push(id);save()}
-}
-function finish(id,ok){
-const q=db.questions.find(x=>x.id===id);
-db.done=db.done.filter(x=>x!==id);db.review=db.review.filter(x=>x!==id);
-if(ok){db.done.push(id);db.stats.correct++}else{db.review.push(id);db.stats.wrong++}
-save();render();setTimeout(()=>{const next=document.querySelector('.question');if(next)next.scrollIntoView({behavior:'smooth',block:'start'})},60)
-}
-function jump(id){state.search='';render();setTimeout(()=>document.getElementById('question-'+id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
-function search(v){state.search=v;render()}
-function go(t){state.tab=t;state.selectedBook=null;state.selectedSubject=null;render()}
-function filterBook(id){state.selectedBook=id;state.selectedSubject=null;render()}
-function filterSubject(id){state.selectedSubject=id;state.selectedBook=null;render()}
-function toggleTeacher(){db.mode=db.mode==='teacher'?'study':'teacher';save();render()}
-function resetBook(id){if(confirm('Resetar o progresso deste caderno?')){const ids=db.questions.filter(q=>q.book===id).map(q=>q.id);db.done=db.done.filter(x=>!ids.includes(x));db.review=db.review.filter(x=>!ids.includes(x));save();render()}}
-function manageView(){
-const selected=state.manageBook?db.books.find(b=>b.id===state.manageBook):db.books[0];if(selected&&!state.manageBook)state.manageBook=selected.id;
-const book=selected||db.books[0], subject=state.manageSubject?book.subjects.find(s=>s.id===state.manageSubject):null;
-const qs=db.questions.filter(q=>q.book===book?.id&&(subject?q.subject===subject.id:true));
-return `<div class="manage"><div class="panel"><div class="topline"><h3>Cadernos</h3><button class="primary" onclick="addBook()">+ Caderno</button></div>${db.books.map(b=>`<div class="list-item ${book?.id===b.id?'sel':''}" onclick="selectManageBook('${b.id}')"><b>${escape(b.name)}</b></div>`).join('')}<hr><h4>+All — importação estruturada</h4><div class="toolbar"><textarea id="allImport" placeholder="Caderno 1: matéria 1; matéria 2;"></textarea><button class="primary" onclick="importAll()">Importar</button></div></div>
-<div class="panel"><h3>Questões</h3><div class="topline"><span>${book?escape(book.name):''}${subject?' · '+escape(subject.name):''}</span><button class="primary" onclick="newQuestion()">+ Questão</button></div>${book?book.subjects.map(s=>`<div class="list-item ${subject?.id===s.id?'sel':''}" onclick="selectManageSubject('${s.id}')">${escape(s.name)} <small>(${db.questions.filter(q=>q.subject===s.id).length})</small></div>`).join(''):''}<hr>${qs.map(q=>`<div class="list-item" onclick="editQuestion('${q.id}')">${escape(q.statement.slice(0,80))}${q.statement.length>80?'…':''}</div>`).join('')||'<div class="empty">Nenhuma questão.</div>'}</div>
-<div class="panel formpanel" id="editor"><div class="empty">Selecione uma questão ou clique em “+ Questão”.</div></div></div>`
-}
-function selectManageBook(id){state.manageBook=id;state.manageSubject=null;render()}
-function selectManageSubject(id){state.manageSubject=id;render()}
-function addBook(){const n=prompt('Nome do caderno:');if(!n)return;db.books.push({id:'b'+Date.now(),name:n,subjects:[]});save();render()}
-function importAll(){const text=document.getElementById('allImport').value;const lines=text.split(/\n/).map(x=>x.trim()).filter(Boolean);lines.forEach(line=>{const m=line.match(/^([^:]+):\s*(.+)$/);if(!m)return;let b=db.books.find(x=>x.name.toLowerCase()===m[1].trim().toLowerCase());if(!b){b={id:'b'+Date.now()+Math.random(),name:m[1].trim(),subjects:[]};db.books.push(b)}m[2].split(';').map(x=>x.trim()).filter(Boolean).forEach(n=>{if(!b.subjects.some(s=>s.name.toLowerCase()===n.toLowerCase()))b.subjects.push({id:'s'+Date.now()+Math.random(),name:n,q:[]})})});save();render()}
-function newQuestion(){const b=db.books.find(x=>x.id===state.manageBook)||db.books[0];if(!b||!b.subjects.length){alert('Crie ao menos uma matéria no caderno selecionado.');return}editor({book:b.id,subject:b.subjects[0].id,board:'',format:'Múltipla Escolha',statement:'',options:['','','',''],answer:0,explanation:''})}
-function editQuestion(id){editor(db.questions.find(q=>q.id===id))}
-function editor(q){
-document.getElementById('editor').innerHTML=`<h3>${q.id?'Editar':'Nova'} questão</h3><div class="form-grid">
-<select id="fbook" onchange="refreshSubjects()">${db.books.map(b=>`<option value="${b.id}" ${b.id===q.book?'selected':''}>${escape(b.name)}</option>`).join('')}</select>
-<select id="fsubject">${db.books.find(b=>b.id===q.book).subjects.map(s=>`<option value="${s.id}" ${s.id===q.subject?'selected':''}>${escape(s.name)}</option>`).join('')}</select>
-<input id="fboard" placeholder="Banca" value="${escape(q.board)}"><select id="fformat"><option ${q.format==='Múltipla Escolha'?'selected':''}>Múltipla Escolha</option><option ${q.format==='Certo ou Errado'?'selected':''}>Certo ou Errado</option></select>
-<textarea class="full" id="fstatement" placeholder="Enunciado — use Enter para quebra de linha">${escape(q.statement)}</textarea>
-${q.options.map((o,i)=>`<input id="fo${i}" placeholder="Alternativa ${i+1}" value="${escape(o)}">`).join('')}
-<select id="fanswer">${q.options.map((o,i)=>`<option value="${i}" ${i===q.answer?'selected':''}>Gabarito: alternativa ${i+1}</option>`).join('')}</select>
-<textarea class="full" id="fexp" placeholder="Explicação manual da resposta">${escape(q.explanation)}</textarea>
-</div><div style="display:flex;gap:8px;margin-top:12px"><button class="primary" onclick="saveQuestion('${q.id||''}')">Salvar</button>${q.id?'<button class="danger" onclick="deleteQuestion(\\''+q.id+'\\')">Excluir</button>':''}</div>`
-}
-function refreshSubjects(){const b=db.books.find(x=>x.id===document.getElementById('fbook').value);document.getElementById('fsubject').innerHTML=b.subjects.map(s=>`<option value="${s.id}">${escape(s.name)}</option>`).join('')}
-function saveQuestion(id){
-const q={id:id||'q'+Date.now(),book:document.getElementById('fbook').value,subject:document.getElementById('fsubject').value,board:document.getElementById('fboard').value.trim(),format:document.getElementById('fformat').value,statement:document.getElementById('fstatement').value,options:[0,1,2,3].map(i=>document.getElementById('fo'+i).value),answer:+document.getElementById('fanswer').value,explanation:document.getElementById('fexp').value};
-const i=db.questions.findIndex(x=>x.id===q.id);if(i>=0)db.questions[i]=q;else db.questions.push(q);save();render();state.manageBook=q.book;state.manageSubject=q.subject;editQuestion(q.id)
-}
-function deleteQuestion(id){db.questions=db.questions.filter(q=>q.id!==id);db.done=db.done.filter(x=>x!==id);db.review=db.review.filter(x=>x!==id);save();render()}
-render();
+(function () {
+  'use strict';
+
+  var KEY = 'queststudio-v2';
+
+  var seed = {
+    books: [
+      {id:'b1', name:'Caderno 1', subjects:[
+        {id:'s1', name:'Lógica de Programação'},
+        {id:'s2', name:'Banco de Dados'}
+      ]},
+      {id:'b2', name:'Caderno 2', subjects:[
+        {id:'s3', name:'Engenharia de Software'},
+        {id:'s4', name:'Redes'}
+      ]}
+    ],
+    questions: [
+      {id:'q1',book:'b1',subject:'s1',board:'Cesgranrio',format:'Múltipla Escolha',
+       statement:'Qual estrutura de repetição é normalmente usada quando a quantidade de iterações é conhecida previamente?',
+       options:['for','switch','try/catch','class'],answer:0,
+       explanation:'O laço for é apropriado quando a repetição pode ser controlada por um contador ou uma condição inicial/final.'},
+      {id:'q2',book:'b1',subject:'s2',board:'Cesgranrio',format:'Certo ou Errado',
+       statement:'Uma chave primária identifica unicamente cada registro de uma tabela.',
+       options:['Certo','Errado'],answer:0,
+       explanation:'A chave primária deve identificar cada linha de forma única.'},
+      {id:'q3',book:'b2',subject:'s3',board:'FCC',format:'Múltipla Escolha',
+       statement:'Qual modelo de desenvolvimento organiza o projeto em etapas sequenciais?',
+       options:['Cascata','Scrum','Kanban','XP'],answer:0,
+       explanation:'O modelo Cascata organiza o desenvolvimento em fases sequenciais.'},
+      {id:'q4',book:'b2',subject:'s4',board:'FGV',format:'Certo ou Errado',
+       statement:'O protocolo HTTP é usado na camada de aplicação da arquitetura TCP/IP.',
+       options:['Certo','Errado'],answer:0,
+       explanation:'HTTP é um protocolo da camada de aplicação.'}
+    ],
+    done: [],
+    review: [],
+    stats: {correct:0, wrong:0},
+    mode: 'study'
+  };
+
+  var db;
+  try {
+    db = JSON.parse(localStorage.getItem(KEY) || 'null');
+  } catch (e) {
+    db = null;
+  }
+  if (!db || !Array.isArray(db.books) || !Array.isArray(db.questions)) {
+    db = seed;
+  }
+  if (!Array.isArray(db.done)) db.done = [];
+  if (!Array.isArray(db.review)) db.review = [];
+  if (!db.stats) db.stats = {correct:0,wrong:0};
+  if (typeof db.stats.correct !== 'number') db.stats.correct = 0;
+  if (typeof db.stats.wrong !== 'number') db.stats.wrong = 0;
+
+  var state = {
+    tab:'estudar',
+    search:'',
+    selectedBook:null,
+    selectedSubject:null,
+    manageBook:db.books.length ? db.books[0].id : null,
+    manageSubject:null
+  };
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e) {}
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function bookName(id) {
+    for (var i=0;i<db.books.length;i++) if (db.books[i].id === id) return db.books[i].name;
+    return '';
+  }
+
+  function subjectName(id) {
+    for (var i=0;i<db.books.length;i++) {
+      for (var j=0;j<db.books[i].subjects.length;j++) {
+        if (db.books[i].subjects[j].id === id) return db.books[i].subjects[j].name;
+      }
+    }
+    return '';
+  }
+
+  function percent() {
+    var t = db.stats.correct + db.stats.wrong;
+    return t ? Math.round(db.stats.correct / t * 100) : 0;
+  }
+
+  function pending() {
+    return db.questions.filter(function(q) {
+      return db.done.indexOf(q.id) === -1 && db.review.indexOf(q.id) === -1;
+    });
+  }
+
+  function render() {
+    var app = document.getElementById('app');
+    if (!app) return;
+
+    app.innerHTML =
+      '<header>' +
+        '<div class="brand" id="brand">QuestStudio</div>' +
+        '<div class="search">' +
+          '<input id="searchInput" placeholder="Pesquisar questões..." value="' + esc(state.search) + '">' +
+          (state.search ? searchResults() : '') +
+        '</div>' +
+        '<div class="metrics">' +
+          '<div class="metric">Acertos <b>' + db.stats.correct + '</b></div>' +
+          '<div class="metric">Erros <b>' + db.stats.wrong + '</b></div>' +
+          '<div class="metric">Desempenho <b>' + percent() + '%</b></div>' +
+        '</div>' +
+        '<button class="prof ' + (db.mode === 'teacher' ? 'active' : '') + '" id="teacherBtn">🎓 Modo Professor</button>' +
+      '</header>' +
+      '<nav>' +
+        tabButton('estudar','Estudar') +
+        tabButton('revisao','Área de Revisão') +
+        tabButton('feitas','Questões Feitas') +
+        tabButton('gerenciar','Gerenciar Conteúdo') +
+      '</nav>' +
+      '<main>' + (state.tab === 'gerenciar' ? manageView() : studyView()) + '</main>';
+
+    document.getElementById('brand').onclick = function(){ go('estudar'); };
+    document.getElementById('teacherBtn').onclick = toggleTeacher;
+
+    var input = document.getElementById('searchInput');
+    input.oninput = function(){ state.search = input.value; render(); };
+    input.onkeydown = function(e){ if(e.key === 'Escape'){ state.search=''; render(); } };
+
+    bindTabs();
+    bindStudyActions();
+  }
+
+  function tabButton(id,label) {
+    return '<button class="tab ' + (state.tab === id ? 'active':'') + '" data-tab="' + id + '">' + label + '</button>';
+  }
+
+  function bindTabs() {
+    var tabs = document.querySelectorAll('[data-tab]');
+    for (var i=0;i<tabs.length;i++) {
+      tabs[i].onclick = function(){ go(this.getAttribute('data-tab')); };
+    }
+  }
+
+  function searchResults() {
+    var term = state.search.toLowerCase().trim();
+    if (!term) return '';
+    var words = term.split(/\s+/).filter(Boolean);
+    var arr = db.questions.filter(function(q) {
+      var hay = (q.statement+' '+q.explanation+' '+q.board+' '+subjectName(q.subject)+' '+bookName(q.book)).toLowerCase();
+      return words.every(function(w){ return hay.indexOf(w) >= 0; });
+    }).slice(0,20);
+
+    return '<div class="results">' +
+      (arr.length ? arr.map(function(q) {
+        return '<div class="result" data-jump="' + esc(q.id) + '">' +
+          '<b>' + esc(q.statement.slice(0,90)) + (q.statement.length>90?'…':'') + '</b>' +
+          '<small>' + esc(bookName(q.book)) + ' · ' + esc(subjectName(q.subject)) + '</small>' +
+        '</div>';
+      }).join('') : '<div class="result">Nenhuma questão encontrada.</div>') +
+    '</div>';
+  }
+
+  function studyView() {
+    var arr;
+    if (state.tab === 'revisao') arr = db.questions.filter(function(q){return db.review.indexOf(q.id)!==-1;});
+    else if (state.tab === 'feitas') arr = db.questions.filter(function(q){return db.done.indexOf(q.id)!==-1;});
+    else arr = pending();
+
+    if (state.selectedBook) arr = arr.filter(function(q){return q.book===state.selectedBook;});
+    if (state.selectedSubject) arr = arr.filter(function(q){return q.subject===state.selectedSubject;});
+
+    return '<div class="layout">' +
+      '<aside class="panel side"><h3>Cadernos</h3>' + sidebar() + '</aside>' +
+      '<section class="view">' +
+        questionFilter() +
+        (arr.length ? arr.map(questionCard).join('') : '<div class="panel empty">Nenhuma questão nesta seção.</div>') +
+      '</section>' +
+    '</div>';
+  }
+
+  function questionFilter() {
+    var filters = [
+      ['all','Todas'],
+      ['pending','Não respondidas'],
+      ['review','Em revisão'],
+      ['done','Feitas']
+    ];
+    var current = 'all';
+    if(state.tab === 'revisao') current = 'review';
+    else if(state.tab === 'feitas') current = 'done';
+    else if(state.tab === 'estudar') current = 'pending';
+
+    return '<div class="filterbar">' +
+      '<span class="filter-label">Filtrar questões</span>' +
+      filters.map(function(f){
+        return '<button class="filter-btn '+(current===f[0]?'active':'')+'" data-question-filter="'+f[0]+'">'+f[1]+'</button>';
+      }).join('') +
+      '<span class="filter-spacer"></span>' +
+      '<span class="filter-label">'+db.questions.length+' questões</span>' +
+    '</div>';
+  }
+
+  function applyQuestionFilter(type) {
+    if(type === 'review') state.tab='revisao';
+    else if(type === 'done') state.tab='feitas';
+    else if(type === 'pending') state.tab='estudar';
+    else state.tab='estudar';
+    state.selectedBook=null;
+    state.selectedSubject=null;
+    render();
+  }
+
+  function sidebar() {
+    return db.books.map(function(b) {
+      var qs = db.questions.filter(function(q){return q.book===b.id;});
+      var solved = qs.filter(function(q){return db.done.indexOf(q.id)!==-1;}).length;
+      return '<div class="folder">' +
+        '<div class="folder-head" data-book="'+esc(b.id)+'"><b>'+esc(b.name)+'</b><span>'+solved+'/'+qs.length+'</span></div>' +
+        '<div class="folder-body">' +
+          b.subjects.map(function(s) {
+            var x = qs.filter(function(q){return q.subject===s.id;});
+            var d = x.filter(function(q){return db.done.indexOf(q.id)!==-1;}).length;
+            return '<div class="subject" data-subject="'+esc(s.id)+'"><span>'+esc(s.name)+'</span><span>'+d+'/'+x.length+'</span></div>';
+          }).join('') +
+          '<button class="reset" data-reset="'+esc(b.id)+'">Resetar caderno</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function questionCard(q) {
+    var opts = q.options.map(function(o,i) {
+      return '<label class="option"><input type="radio" name="'+esc(q.id)+'" value="'+i+'"> <span>'+esc(o)+'</span></label>';
+    }).join('');
+
+    return '<article class="card question" id="question-'+esc(q.id)+'">' +
+      '<div class="meta"><span class="tag">'+esc(bookName(q.book))+'</span><span class="tag">'+esc(subjectName(q.subject))+'</span><span class="tag">'+esc(q.board)+'</span><span class="tag">'+esc(q.format)+'</span></div>' +
+      '<div class="statement">'+esc(q.statement)+'</div>' +
+      '<div class="options">'+opts+'</div>' +
+      '<div class="answer"><button data-answer="'+esc(q.id)+'">Responder</button></div>' +
+      '<div id="feedback-'+esc(q.id)+'"></div>' +
+    '</article>';
+  }
+
+  function bindStudyActions() {
+    var filters=document.querySelectorAll('[data-question-filter]');
+    for(var fi=0;fi<filters.length;fi++) filters[fi].onclick=function(){
+      applyQuestionFilter(this.getAttribute('data-question-filter'));
+    };
+
+    var jumps = document.querySelectorAll('[data-jump]');
+    for (var i=0;i<jumps.length;i++) jumps[i].onclick = function(){
+      var id=this.getAttribute('data-jump');
+      state.search='';
+      render();
+      setTimeout(function(){
+        var el=document.getElementById('question-'+id);
+        if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+      },50);
+    };
+
+    var books=document.querySelectorAll('[data-book]');
+    for (var i=0;i<books.length;i++) books[i].onclick=function(){filterBook(this.getAttribute('data-book'));};
+
+    var subs=document.querySelectorAll('[data-subject]');
+    for (var i=0;i<subs.length;i++) subs[i].onclick=function(){filterSubject(this.getAttribute('data-subject'));};
+
+    var resets=document.querySelectorAll('[data-reset]');
+    for (var i=0;i<resets.length;i++) resets[i].onclick=function(e){
+      e.stopPropagation(); resetBook(this.getAttribute('data-reset'));
+    };
+
+    var answers=document.querySelectorAll('[data-answer]');
+    for (var i=0;i<answers.length;i++) answers[i].onclick=function(){answer(this.getAttribute('data-answer'));};
+
+    bindManagerActions();
+  }
+
+  function answer(id) {
+    var q=db.questions.filter(function(x){return x.id===id;})[0];
+    var picked=document.querySelector('input[name="'+CSS.escape(id)+'"]:checked');
+    var box=document.getElementById('feedback-'+id);
+    if(!picked){box.innerHTML='<div class="feedback bad">Selecione uma alternativa.</div>';return;}
+    var ok=Number(picked.value)===q.answer;
+    if(db.mode==='teacher' && ok) {
+      box.innerHTML='<div class="teacher-box"><b>Justifique sua resposta</b><p>Explique com suas próprias palavras por que a alternativa escolhida está correta.</p><textarea id="why-'+esc(id)+'" placeholder="Digite sua justificativa..."></textarea><button class="primary" id="gradeBtn-'+esc(id)+'" style="margin-top:9px">Enviar justificativa</button><div id="grade-'+esc(id)+'"></div></div>';
+      document.getElementById('gradeBtn-'+id).onclick=function(){gradeJustification(id);};
+      return;
+    }
+    finish(id,ok);
+  }
+
+  function gradeJustification(id) {
+    var q=db.questions.filter(function(x){return x.id===id;})[0];
+    var text=document.getElementById('why-'+id).value.trim();
+    var target=document.getElementById('grade-'+id);
+    if(!text){target.innerHTML='<div class="feedback bad">Escreva uma justificativa antes de enviar.</div>';return;}
+    var terms=(q.explanation+' '+q.statement).toLowerCase().split(/\W+/).filter(function(x){return x.length>4;});
+    var words=text.toLowerCase().split(/\W+/);
+    var hits=terms.filter(function(t){return words.indexOf(t)!==-1;}).length;
+    var score=Math.min(100,Math.round(45+(hits/Math.max(1,Math.min(terms.length,8)))*55));
+    if(text.length>=45) score=Math.min(100,score+15);
+    var ok=score>=70;
+    target.innerHTML='<div class="feedback '+(ok?'good':'bad')+'">Avaliação da justificativa: '+score+'%. '+(ok?'Clareza e certeza suficientes.':'A justificativa foi enviada para a Área de Revisão.')+'</div>';
+    if(ok) setTimeout(function(){finish(id,true);},700);
+    else {if(db.review.indexOf(id)===-1)db.review.push(id);save();}
+  }
+
+  function finish(id,ok) {
+    db.done=db.done.filter(function(x){return x!==id;});
+    db.review=db.review.filter(function(x){return x!==id;});
+    if(ok){db.done.push(id);db.stats.correct++;}
+    else {db.review.push(id);db.stats.wrong++;}
+    save(); render();
+  }
+
+  function go(t){state.tab=t;state.selectedBook=null;state.selectedSubject=null;render();}
+  function filterBook(id){state.selectedBook=id;state.selectedSubject=null;render();}
+  function filterSubject(id){state.selectedSubject=id;state.selectedBook=null;render();}
+  function toggleTeacher(){db.mode=db.mode==='teacher'?'study':'teacher';save();render();}
+
+  function resetBook(id) {
+    if(!confirm('Resetar o progresso deste caderno?')) return;
+    var ids=db.questions.filter(function(q){return q.book===id;}).map(function(q){return q.id;});
+    db.done=db.done.filter(function(x){return ids.indexOf(x)===-1;});
+    db.review=db.review.filter(function(x){return ids.indexOf(x)===-1;});
+    save();render();
+  }
+
+  function manageView() {
+    var book=db.books.filter(function(b){return b.id===state.manageBook;})[0] || db.books[0];
+    if(book) state.manageBook=book.id;
+    var subject=book && state.manageSubject ? book.subjects.filter(function(s){return s.id===state.manageSubject;})[0] : null;
+    var qs=db.questions.filter(function(q){return book && q.book===book.id && (!subject || q.subject===subject.id);});
+
+    return '<div class="manage">' +
+      '<div class="panel">' +
+        '<div class="topline"><span class="manage-title">Cadernos</span><button class="primary" id="addBookBtn">+ Caderno</button></div>' +
+        '<div class="manage-subtitle">Organize suas matérias e questões.</div>' +
+        db.books.map(function(b){
+          return '<div class="list-item '+(book&&book.id===b.id?'sel':'')+'" data-manage-book="'+esc(b.id)+'">' +
+            '<b>'+esc(b.name)+'</b><button class="danger" title="Excluir caderno" data-delete-book="'+esc(b.id)+'">Excluir</button>' +
+          '</div>';
+        }).join('') +
+        '<hr class="section-divider"><h4>+All — importação estruturada</h4>' +
+        '<div class="toolbar"><textarea id="allImport" placeholder="Caderno 1: matéria 1; matéria 2;"></textarea><button class="primary" id="importBtn">Importar</button></div>' +
+      '</div>' +
+      '<div class="panel">' +
+        '<div class="topline"><span class="manage-title">Matérias e questões</span><button class="primary" id="newQuestionBtn">+ Questão</button></div>' +
+        '<div class="manage-subtitle">'+(book?esc(book.name):'Nenhum caderno selecionado')+'</div>' +
+        (book ? book.subjects.map(function(s){
+          return '<div class="list-item '+(subject&&subject.id===s.id?'sel':'')+'" data-manage-subject="'+esc(s.id)+'">' +
+            '<span>'+esc(s.name)+' <small>('+db.questions.filter(function(q){return q.subject===s.id;}).length+')</small></span>' +
+            '<button class="danger" title="Excluir matéria" data-delete-subject="'+esc(s.id)+'">Excluir</button>' +
+          '</div>';
+        }).join('') : '') +
+        '<hr class="section-divider">' +
+        (qs.map(function(q){
+          return '<div class="list-item" data-edit="'+esc(q.id)+'"><span>'+esc(q.statement.slice(0,80))+(q.statement.length>80?'…':'')+'</span><button class="danger" title="Excluir questão" data-delete-question="'+esc(q.id)+'">Excluir</button></div>';
+        }).join('') || '<div class="empty">Nenhuma questão.</div>') +
+      '</div>' +
+      '<div class="panel formpanel" id="editor"><div class="empty">Selecione uma questão ou clique em “+ Questão”.</div></div>' +
+    '</div>';
+  }
+
+  function bindManagerActions() {
+    if(state.tab!=='gerenciar') return;
+    var add=document.getElementById('addBookBtn'); if(add) add.onclick=addBook;
+    var imp=document.getElementById('importBtn'); if(imp) imp.onclick=importAll;
+    var nq=document.getElementById('newQuestionBtn'); if(nq) nq.onclick=newQuestion;
+
+    document.querySelectorAll('[data-manage-book]').forEach(function(el){
+      el.onclick=function(){state.manageBook=this.getAttribute('data-manage-book');state.manageSubject=null;render();};
+    });
+    document.querySelectorAll('[data-manage-subject]').forEach(function(el){
+      el.onclick=function(){state.manageSubject=this.getAttribute('data-manage-subject');render();};
+    });
+    document.querySelectorAll('[data-edit]').forEach(function(el){
+      el.onclick=function(){editQuestion(this.getAttribute('data-edit'));};
+    });
+
+    document.querySelectorAll('[data-delete-book]').forEach(function(el){
+      el.onclick=function(e){e.stopPropagation();deleteBook(this.getAttribute('data-delete-book'));};
+    });
+    document.querySelectorAll('[data-delete-subject]').forEach(function(el){
+      el.onclick=function(e){e.stopPropagation();deleteSubject(this.getAttribute('data-delete-subject'));};
+    });
+    document.querySelectorAll('[data-delete-question]').forEach(function(el){
+      el.onclick=function(e){e.stopPropagation();deleteQuestion(this.getAttribute('data-delete-question'));};
+    });
+  }
+
+  function deleteBook(id){
+    var b=db.books.filter(function(x){return x.id===id;})[0];
+    if(!b)return;
+    if(!confirm('Excluir o caderno "'+b.name+'" e todas as suas matérias e questões?'))return;
+    var ids=db.questions.filter(function(q){return q.book===id;}).map(function(q){return q.id;});
+    db.questions=db.questions.filter(function(q){return q.book!==id;});
+    db.done=db.done.filter(function(x){return ids.indexOf(x)===-1;});
+    db.review=db.review.filter(function(x){return ids.indexOf(x)===-1;});
+    db.books=db.books.filter(function(x){return x.id!==id;});
+    state.manageBook=db.books.length?db.books[0].id:null;
+    state.manageSubject=null;
+    save();render();
+  }
+
+  function deleteSubject(id){
+    var holder=null;
+    for(var i=0;i<db.books.length;i++){
+      if(db.books[i].subjects.some(function(s){return s.id===id;})){holder=db.books[i];break;}
+    }
+    if(!holder)return;
+    var s=holder.subjects.filter(function(x){return x.id===id;})[0];
+    if(!s)return;
+    if(!confirm('Excluir a matéria "'+s.name+'" e todas as questões dela?'))return;
+    var ids=db.questions.filter(function(q){return q.subject===id;}).map(function(q){return q.id;});
+    db.questions=db.questions.filter(function(q){return q.subject!==id;});
+    db.done=db.done.filter(function(x){return ids.indexOf(x)===-1;});
+    db.review=db.review.filter(function(x){return ids.indexOf(x)===-1;});
+    holder.subjects=holder.subjects.filter(function(x){return x.id!==id;});
+    state.manageSubject=null;
+    save();render();
+  }
+
+  function addBook(){
+    var n=prompt('Nome do caderno:');
+    if(!n) return;
+    var b={id:'b'+Date.now(),name:n.trim(),subjects:[]};
+    b.subjects.push({id:'s'+Date.now(),name:'Nova matéria'});
+    db.books.push(b);state.manageBook=b.id;state.manageSubject=null;save();render();
+  }
+
+  function importAll(){
+    var el=document.getElementById('allImport'); if(!el)return;
+    el.value.split(/\n/).map(function(x){return x.trim();}).filter(Boolean).forEach(function(line){
+      var m=line.match(/^([^:]+):\s*(.+)$/); if(!m)return;
+      var name=m[1].trim(), b=db.books.filter(function(x){return x.name.toLowerCase()===name.toLowerCase();})[0];
+      if(!b){b={id:'b'+Date.now()+Math.random(),name:name,subjects:[]};db.books.push(b);}
+      m[2].split(';').map(function(x){return x.trim();}).filter(Boolean).forEach(function(n){
+        if(!b.subjects.some(function(s){return s.name.toLowerCase()===n.toLowerCase();})) b.subjects.push({id:'s'+Date.now()+Math.random(),name:n});
+      });
+    });
+    save();render();
+  }
+
+  function newQuestion(){
+    var b=db.books.filter(function(x){return x.id===state.manageBook;})[0]||db.books[0];
+    if(!b){alert('Crie um caderno primeiro.');return;}
+    if(!b.subjects.length)b.subjects.push({id:'s'+Date.now(),name:'Nova matéria'});
+    editor({id:'',book:b.id,subject:b.subjects[0].id,board:'',format:'Múltipla Escolha',statement:'',options:['','','',''],answer:0,explanation:''});
+  }
+
+  function editQuestion(id){
+    var q=db.questions.filter(function(x){return x.id===id;})[0];
+    if(q) editor(q);
+  }
+
+  function editor(q){
+    var panel=document.getElementById('editor'); if(!panel)return;
+    var b=db.books.filter(function(x){return x.id===q.book;})[0]||db.books[0];
+    panel.innerHTML='<h3>'+(q.id?'Editar':'Nova')+' questão</h3><div class="form-grid">' +
+      '<select id="fbook">'+db.books.map(function(x){return '<option value="'+esc(x.id)+'" '+(x.id===b.id?'selected':'')+'>'+esc(x.name)+'</option>';}).join('')+'</select>' +
+      '<select id="fsubject">'+(b.subjects||[]).map(function(s){return '<option value="'+esc(s.id)+'" '+(s.id===q.subject?'selected':'')+'>'+esc(s.name)+'</option>';}).join('')+'</select>' +
+      '<input id="fboard" placeholder="Banca" value="'+esc(q.board)+'">' +
+      '<select id="fformat"><option '+(q.format==='Múltipla Escolha'?'selected':'')+'>Múltipla Escolha</option><option '+(q.format==='Certo ou Errado'?'selected':'')+'>Certo ou Errado</option></select>' +
+      '<textarea class="full" id="fstatement" placeholder="Enunciado — use Enter para quebra de linha">'+esc(q.statement)+'</textarea>' +
+      q.options.map(function(o,i){return '<input id="fo'+i+'" placeholder="Alternativa '+(i+1)+'" value="'+esc(o)+'">';}).join('') +
+      '<select id="fanswer">'+q.options.map(function(o,i){return '<option value="'+i+'" '+(i===q.answer?'selected':'')+'>Gabarito: alternativa '+(i+1)+'</option>';}).join('')+'</select>' +
+      '<textarea class="full" id="fexp" placeholder="Explicação manual da resposta">'+esc(q.explanation)+'</textarea>' +
+      '</div><div style="display:flex;gap:8px;margin-top:12px"><button class="primary" id="saveQ">Salvar</button>'+(q.id?'<button class="danger" id="deleteQ">Excluir</button>':'')+'</div>';
+
+    document.getElementById('fbook').onchange=function(){
+      var nb=db.books.filter(function(x){return x.id===this.value;},this)[0];
+      document.getElementById('fsubject').innerHTML=(nb.subjects||[]).map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>';}).join('');
+    };
+    document.getElementById('saveQ').onclick=function(){saveQuestion(q.id||'');};
+    var del=document.getElementById('deleteQ'); if(del)del.onclick=function(){deleteQuestion(q.id);};
+  }
+
+  function saveQuestion(id){
+    var q={
+      id:id||'q'+Date.now(),
+      book:document.getElementById('fbook').value,
+      subject:document.getElementById('fsubject').value,
+      board:document.getElementById('fboard').value.trim(),
+      format:document.getElementById('fformat').value,
+      statement:document.getElementById('fstatement').value,
+      options:[0,1,2,3].map(function(i){return document.getElementById('fo'+i).value;}),
+      answer:Number(document.getElementById('fanswer').value),
+      explanation:document.getElementById('fexp').value
+    };
+    var idx=db.questions.findIndex(function(x){return x.id===q.id;});
+    if(idx>=0)db.questions[idx]=q;else db.questions.push(q);
+    state.manageBook=q.book;state.manageSubject=q.subject;
+    save();render();editQuestion(q.id);
+  }
+
+  function deleteQuestion(id){
+    db.questions=db.questions.filter(function(q){return q.id!==id;});
+    db.done=db.done.filter(function(x){return x!==id;});
+    db.review=db.review.filter(function(x){return x!==id;});
+    save();render();
+  }
+
+  // Primeira execução: renderização direta e sem dependências externas.
+  render();
+})();
 </script>
 </body>
 </html>
